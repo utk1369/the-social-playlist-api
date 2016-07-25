@@ -40,7 +40,8 @@ router.post('/create', function(req, res, next) {
             console.error(err);
         } else {
             console.log("User created", result);
-            res.send(result);
+            resultArr = [result];
+            res.send(resultArr);
         }
     });
 });
