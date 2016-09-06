@@ -4,30 +4,32 @@ var Schema = mongoose.Schema;
 var userSchema = new Schema({
         name: {type: String, required: true},
         fbId: {type: String, required: true},
-        songsCollection: [{
-            songId: {type: Number, required: true},
+        status: String,
+        imageUrl: String,
+        friends: [mongoose.Schema.Types.ObjectId],
+        songs: [{
+            id: {type: Number, required: true},
             metadata: {
-                songName: {type: String, required: true},
+                title: {type: String, required: true},
                 artist: String,
                 album: String
             },
-            youtubeLink: String,
+            externalLinks: {
+                youtube: String
+            },
             hits: {type: Number, default: 0},
-            lastListened: Date,
+            lastListenedAt: Date,
             likes: [mongoose.Schema.Types.ObjectId],
             rating: Number
         }],
-        dedications: [{
-            targetUserId: mongoose.Schema.Types.ObjectId,
-            youtubeLink: String,
-            timestamp: Date,
-            share: Boolean
-        }],
-        recommendations: [{
-            targetUserId: mongoose.Schema.Types.ObjectId,
-            youtubeLink: String,
-            timestamp: Date,
-            share: Boolean,
+        socialActivities: [{
+            activityType: {type: String, enum: ["dedication", "recommendation", "share"]},
+            domain: {type: String, enum: ["public", "private"]},
+            recipientUserIds: [mongoose.Schema.Types.ObjectId],
+            externalLinks: {
+                youtube: String
+            },
+            timestamp: Date
         }],
         createdAt: Date,
         updatedAt: Date
