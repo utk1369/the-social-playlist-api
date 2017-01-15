@@ -1,11 +1,9 @@
 var express = require('express');
 var router = express.Router();
-
-var mongoose = require('mongoose'); //Mongo Connection
 var bodyParser = require('body-parser'); //Parses POST requests
 var methodOverride = require('method-override'); //Manipulates POST requests
 var User = require('../models/Users');
-var UsersDAO = require('../dao/UsersDAO');
+var userService = require('../services/UserService');
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
@@ -22,9 +20,13 @@ router.get('/', function(req, res, next) {
 router.post('/search', function(req, res, next) {
     var payload = req.body;
     var criteria = payload.criteria;
-    var projections = payload.projections;
+    var projectionsArr = payload.projections;
 
-    UsersDAO.search(criteria, projections, function(result) {
+    userService.search(criteria, projectionsArr, function(err, result) {
+        if(err) {
+            console.log("User retrieval failed");
+            throw new Error("Failed to search User");
+        }
         res.send(result);
     });
 });
@@ -35,14 +37,29 @@ router.post('/create', function(req, res, next) {
     var payload = req.body;
     var newUser = new User(payload);
 
-    newUser.save(function(err, result) {
+    userService.create(newUser, function(err, savedNewUser) {
         if(err) {
-            console.error(err);
-        } else {
-            console.log("User created", result);
-            resultArr = [result];
-            res.send(resultArr);
+            console.log("Error occured while saving User");
+            throw new Error("User creation failed");
         }
+        console.log("User created", savedNewUser);
+        res.send(savedNewUser);
+    })
+});
+
+router.post('/updateAttributes', function(req, res, next) {
+    var updatePayload = req.body;
+    var userId = req.param('id');
+    if(userId == null)
+        throw new Error('User Id not provided for update.');
+
+    userService.updateById(userId, updatePayload, function(err, savedUser) {
+        if(err) {
+            console.log("Failed to update user attributes.");
+            throw new Error("User Attributes update failed.");
+        }
+        console.log("User details updated", savedUser);
+        res.send(savedUser);
     });
 });
 
