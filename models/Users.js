@@ -6,8 +6,10 @@ var userSchema = new Schema({
         fbId: {type: String, required: true, unique: true},
         status: String,
         imageUrl: String,
-        friends: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],//need to use selective populate.
-        //can be separated out
+        friends: [{
+            friend: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
+            fbId: String
+        }],
         songs: [{
             id: {type: Number, required: true},
             metadata: {
@@ -27,7 +29,7 @@ var userSchema = new Schema({
             likes: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
             rating: Number,
             socialActivities: [{type: mongoose.Schema.Types.ObjectId, ref: 'SocialActivity'}] //to be added to android
-            //socialactivities are associated with every song so that we can query for only relevant activities song wise. also there is no link back from social activity to song
+            //socialActivities are associated with every song so that we can query for only relevant activities song wise. also there is no link back from social activity to song
         }],
         createdAt: Date,
         updatedAt: Date

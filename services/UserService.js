@@ -1,6 +1,66 @@
-var User = require('../models/Users')
+var User = require('../models/Users');
 
 var songService = require('./SongService')
+
+var fetchUserDetailsById =
+    function(userId) {
+        //this method returns the user details based on the id provided.
+        //the result will also populate the friends list along with few basic details like name, status, imageUrl etc
+    }
+
+/*
+    this method returns the user details based on the id provided.
+    the result will also populate the friends list along with few basic details like name, status, imageUrl etc
+*/
+var fetchUserDetailsByFbId =
+    function(fbId, populateFriends, callback) {
+        if(!populateFriends)
+            User.findOne({fbId: fbId}, null, callback);
+    }
+
+var getFbIdToUserIdMap =
+    function(fbIds, callback) {
+        User.find({ fbId: {$in: fbIds}}, 'fbId _id', callback);
+    }
+
+/*
+    * userId: _id of the user whose friends are to be compared and updated
+    * friendsToBeAdded: List of FB Ids of users who are to be added as friends of userId
+ */
+var addFriendsForUser =
+    function(userId, friendsToBeAdded, callback) {
+        if(friends == null || friendsToBeAdded.length === 0)
+            callback(null, []);
+        User.find({ fbId: {$in: friendsToBeAdded}}, '_id', function(err, result) {
+            if(err) {
+                callback(err, null);
+            } else {
+                User.findByIdAndUpdate(userId, {$pushAll: {friends: result}}, {new: true, upsert: true}, callback);
+            }
+        });
+    }
+
+/*
+    * userId: _id of the user whose friends are to be compared and updated
+    * existingFriendsList: list of users who are already friends with userId on TSP
+    * newFriendsList: List of users who are friends with userId on FB
+ */
+var updateFriendsListForUser =
+    function(existingUserDetails, newUserDetails, callback) {
+        var friendsToAdd = []; var newFriendsList = newUserDetails['friends']; var existingFriendsList = existingUserDetails['friends'];
+        for(var i in newFriendsList['friends']) {
+            var fbIdToSearch = newFriendsList[i]['fbId'];
+            var found = false;
+            for(var j in existingFriendsList) {
+                if(existingFriendsList[j]['fbId'] === fbIdToSearch) {
+                    found = true; break;
+                }
+            }
+            if(!found)
+                friendsToAdd.push(newFriendsList[i]);
+        }
+        addFriendsForUser(existingUserDetails['_id'], friendsToAdd, callback);
+    }
 
 /* searchUsers --> returns a list of users matching the specified criteria
  * criteria: the selection criteria analogous to the WHERE clause in SQL
@@ -12,7 +72,7 @@ var searchUsers =
         var projections = null;
         if(projectionsArr != null)
             projections = projectionsArr.join(' ');
-        User.find(criteria, projections,callback);
+        User.find(criteria, projections, callback);
     };
 
 /*
@@ -30,14 +90,50 @@ var saveUser =
     * options: {new: true} ensures that always the modified object is returned
  */
 var updateUserAttributesById =
-    function(userId, fieldsToBeUpdated, callback) {
+    function(userId, fieldsToBeUpdated, populateFriends, callback) {
         User.findByIdAndUpdate(userId, { $set: fieldsToBeUpdated}, { new: true }, callback);
     };
+
+/*
+ * existingUserDetails: Existing User Info for the user
+ * newUserDetails: New User Details against which the comparison of the existingUserDetails is to be made
+ */
+var updateUserDetails =
+    function(existingUserDetails, newUserDetails, attributesToUpdate, callback) {
+        if(existingUserDetails == null) {
+            saveUser(newUserDetails, callback);
+        } else if(newUserDetails == null) {
+            callback(null, existingUserDetails);
+        } else {
+            var PRIMITIVE_ATTRIBUTES = ['name', 'status', 'imageUrl'];
+            var fieldsToBeUpdated = {};
+            for(var i in PRIMITIVE_ATTRIBUTES) {
+                var attribute = PRIMITIVE_ATTRIBUTES[i];
+                if(attributesToUpdate.indexOf(attribute) != -1
+                    &&!(newUserDetails[attribute] === existingUserDetails[attribute]))
+                    fieldsToBeUpdated[attribute] = newUserDetails[attribute];
+            }
+            if(attributesToUpdate.indexOf('friends') != -1)
+                fieldsToBeUpdated['friends'] = newUserDetails['friends'];
+            updateUserAttributesById(existingUserDetails['_id'], fieldsToBeUpdated, callback);
+        }
+    };
+
+var addSongsForUser =
+    function(userId, songsListToBeAdded, callback) {
+        User.findByIdAndUpdate(userId, {$pushAll: {songs: songsListToBeAdded}}, {new: true, upsert: true}, callback);
+    }
+
 
 var userService = {
     search: searchUsers,
     create: saveUser,
-    updateById: updateUserAttributesById
+    updateById: updateUserAttributesById,
+    updateUserDetails: updateUserDetails,
+    fetchUserDetailsByFbId: fetchUserDetailsByFbId,
+    updateFriendsListForUser: updateFriendsListForUser,
+    fbIdToUserIdMap: getFbIdToUserIdMap,
+    addSongs: addSongsForUser
 }
 
 module.exports = userService;

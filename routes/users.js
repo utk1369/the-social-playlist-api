@@ -1,13 +1,11 @@
-var express = require('express');
-var router = express.Router();
-var bodyParser = require('body-parser'); //Parses POST requests
-var methodOverride = require('method-override'); //Manipulates POST requests
+var usersFilters = require('../middlewares/filters/request/users');
+var router = usersFilters.router;
+var userService = usersFilters.userService;
 var User = require('../models/Users');
-var userService = require('../services/UserService');
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
-    User.find({}, function(err, result) {
+    User.find({}).populate('friends.friend').exec(function(err, result) {
         if(err) {
             console.error(err.message);
         } else {
@@ -63,4 +61,41 @@ router.post('/updateAttributes', function(req, res, next) {
     });
 });
 
-module.exports = router;
+router.post('/login', function(req, res, next) {
+    var payload = req.body;
+    var newUserDetails = new User(payload);
+
+    var fetchUserCallback =  function(err, existingUserDetails) {
+        if(err) {
+            console.log("User retrieval failed");
+            throw new Error("Failed to find User");
+        }
+        userService.updateUserDetails(existingUserDetails, newUserDetails, ['name', 'status', 'imageUrl', 'friends'], function(err, updatedUserDetails) {
+            if(err) {
+                throw new Error("Update Failed");
+            }
+            console.log("User details updated", updatedUserDetails);
+            res.send(updatedUserDetails);
+        })
+    };
+    userService.fetchUserDetailsByFbId(newUserDetails['fbId'], false, fetchUserCallback);
+})
+
+router.post('/:id/songs/add', function(req, res, next) {
+    var userId = req.params.id;
+    var listOfSongsToBeAdded = req.body;
+    userService.addSongs(userId, listOfSongsToBeAdded, function(err, result) {
+        if(err) {
+            throw new Error("Failed to add songs");
+        }
+        res.send(result);
+    })
+});
+
+router.post('/:id/songs/remove', function(req, res, next) {
+
+});
+
+module.exports = {
+    router: router
+}
