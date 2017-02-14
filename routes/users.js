@@ -62,6 +62,7 @@ router.post('/updateAttributes', function(req, res, next) {
 });
 
 router.post('/login', function(req, res, next) {
+    var friendsPreview = req.param['friendsPreview'];
     var payload = req.body;
     var newUserDetails = new User(payload);
 
@@ -81,10 +82,10 @@ router.post('/login', function(req, res, next) {
     userService.fetchUserDetailsByFbId(newUserDetails['fbId'], false, fetchUserCallback);
 })
 
-router.post('/:id/songs/add', function(req, res, next) {
+router.post('/:id/songs/save', function(req, res, next) {
     var userId = req.params.id;
-    var listOfSongsToBeAdded = req.body;
-    userService.addSongs(userId, listOfSongsToBeAdded, function(err, result) {
+    var listOfSongsToBeSaved = req.body;
+    userService.saveSongs(userId, listOfSongsToBeSaved, function(err, result) {
         if(err) {
             throw new Error("Failed to add songs");
         }

@@ -90,7 +90,7 @@ var saveUser =
     * options: {new: true} ensures that always the modified object is returned
  */
 var updateUserAttributesById =
-    function(userId, fieldsToBeUpdated, populateFriends, callback) {
+    function(userId, fieldsToBeUpdated, callback) {
         User.findByIdAndUpdate(userId, { $set: fieldsToBeUpdated}, { new: true }, callback);
     };
 
@@ -119,9 +119,46 @@ var updateUserDetails =
         }
     };
 
-var addSongsForUser =
-    function(userId, songsListToBeAdded, callback) {
-        User.findByIdAndUpdate(userId, {$pushAll: {songs: songsListToBeAdded}}, {new: true, upsert: true}, callback);
+var saveSongsForUser =
+    function(userId, songsListToBeSaved, callback) {
+
+        var compareAndSave = function(songsListOfUser, songsToBeSaved) {
+            var mergedList = [];
+
+            var findAndRemoveFromList = function(searchElement, listOfSongs) {
+                for(var i in listOfSongs) {
+                    if(searchElement['id'] === listOfSongs[i]['id']) {
+                        var updatedDetails = listOfSongs[i];
+                        listOfSongs.splice(i, 1);
+                        return updatedDetails;
+                    }
+                }
+                return null;
+            }
+
+            for(var i in songsListOfUser) {
+                var newSongDetails = findAndRemoveFromList(songsListOfUser[i], songsToBeSaved);
+                if(newSongDetails)
+                    mergedList.push(newSongDetails);
+                else
+                    mergedList.push(songsListOfUser[i]);
+            }
+            mergedList = mergedList.concat(songsToBeSaved);
+
+            updateUserAttributesById(userId, {'songs': mergedList}, function(err, result) {
+                if(err)
+                    callback(err, null);
+                else
+                    callback(null, result['songs']);
+            });
+        }
+
+        User.findById(userId, 'songs', function(err, songsListOfUser) {
+            if(err) {
+                throw new Error("Unable to fetch Songs");
+            }
+            compareAndSave(songsListOfUser['songs'], songsListToBeSaved);
+        })
     }
 
 
@@ -133,7 +170,7 @@ var userService = {
     fetchUserDetailsByFbId: fetchUserDetailsByFbId,
     updateFriendsListForUser: updateFriendsListForUser,
     fbIdToUserIdMap: getFbIdToUserIdMap,
-    addSongs: addSongsForUser
+    saveSongs: saveSongsForUser
 }
 
 module.exports = userService;
