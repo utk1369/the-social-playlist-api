@@ -79,7 +79,7 @@ router.post('/login', function(req, res, next) {
             throw new Error("Failed to find User");
         }
         userService.updateUserDetails(existingUserDetails, newUserDetails,
-            ['name', 'status', 'imageUrl', 'friends'], fieldsToBePopulated, function(err, updatedUserDetails) {
+            ['name', 'imageUrl', 'friends'], fieldsToBePopulated, function(err, updatedUserDetails) {
                 if(err) {
                     throw new Error("Update Failed");
                 }
