@@ -90,8 +90,11 @@ var saveUser =
     * options: {new: true} ensures that always the modified object is returned
  */
 var updateUserAttributesById =
-    function(userId, fieldsToBeUpdated, callback) {
-        User.findByIdAndUpdate(userId, { $set: fieldsToBeUpdated}, { new: true }, callback);
+    function(userId, fieldsToBeUpdated, fieldsToBePopulated, callback) {
+        var query = User.findByIdAndUpdate(userId, { $set: fieldsToBeUpdated}, { new: true });
+        if(fieldsToBePopulated != null && fieldsToBePopulated.length > 0)
+            query = query.populate(fieldsToBePopulated);
+        query.exec(callback);
     };
 
 /*
@@ -99,7 +102,7 @@ var updateUserAttributesById =
  * newUserDetails: New User Details against which the comparison of the existingUserDetails is to be made
  */
 var updateUserDetails =
-    function(existingUserDetails, newUserDetails, attributesToUpdate, callback) {
+    function(existingUserDetails, newUserDetails, attributesToUpdate, fieldsToBePopulated, callback) {
         if(existingUserDetails == null) {
             saveUser(newUserDetails, callback);
         } else if(newUserDetails == null) {
@@ -115,7 +118,7 @@ var updateUserDetails =
             }
             if(attributesToUpdate.indexOf('friends') != -1)
                 fieldsToBeUpdated['friends'] = newUserDetails['friends'];
-            updateUserAttributesById(existingUserDetails['_id'], fieldsToBeUpdated, callback);
+            updateUserAttributesById(existingUserDetails['_id'], fieldsToBeUpdated, fieldsToBePopulated, callback);
         }
     };
 
@@ -145,7 +148,7 @@ var saveSongsForUser =
             }
             mergedList = mergedList.concat(songsToBeSaved);
 
-            updateUserAttributesById(userId, {'songs': mergedList}, function(err, result) {
+            updateUserAttributesById(userId, {'songs': mergedList}, null, function(err, result) {
                 if(err)
                     callback(err, null);
                 else

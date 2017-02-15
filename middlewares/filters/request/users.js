@@ -7,7 +7,7 @@ var userService = require('../../../services/UserService');
 
 router.use('/login',  function(req, res, next) {
     var compressFlag = req.param('compress');
-    if(compressFlag) {
+    if(compressFlag != null && compressFlag === 'true') {
         var userInfo = req.body;
         var friendsList = userInfo['friends'];
         if(friendsList != null && friendsList.length > 0) {
@@ -32,6 +32,7 @@ router.use('/login',  function(req, res, next) {
             return next();
         }
     } else {
+        //perform a payload check for the friends list and forward it to next only when the payload is correct or else throw a bad request error.
         return next();
     }
 });

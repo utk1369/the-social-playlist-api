@@ -46,12 +46,16 @@ router.post('/create', function(req, res, next) {
 });
 
 router.post('/updateAttributes', function(req, res, next) {
+    var populate = req.param('populate');
+    var fieldsToBePopulated = null;
+    if(populate)
+        fieldsToBePopulated = populate.split(',');
     var updatePayload = req.body;
     var userId = req.param('id');
     if(userId == null)
         throw new Error('User Id not provided for update.');
 
-    userService.updateById(userId, updatePayload, function(err, savedUser) {
+    userService.updateById(userId, updatePayload, fieldsToBePopulated, function(err, savedUser) {
         if(err) {
             console.log("Failed to update user attributes.");
             throw new Error("User Attributes update failed.");
@@ -62,7 +66,10 @@ router.post('/updateAttributes', function(req, res, next) {
 });
 
 router.post('/login', function(req, res, next) {
-    var friendsPreview = req.param['friendsPreview'];
+    var populate = req.param('populate');
+    var fieldsToBePopulated = null;
+    if(populate)
+        fieldsToBePopulated = populate.split(',');
     var payload = req.body;
     var newUserDetails = new User(payload);
 
@@ -71,12 +78,13 @@ router.post('/login', function(req, res, next) {
             console.log("User retrieval failed");
             throw new Error("Failed to find User");
         }
-        userService.updateUserDetails(existingUserDetails, newUserDetails, ['name', 'status', 'imageUrl', 'friends'], function(err, updatedUserDetails) {
-            if(err) {
-                throw new Error("Update Failed");
-            }
-            console.log("User details updated", updatedUserDetails);
-            res.send(updatedUserDetails);
+        userService.updateUserDetails(existingUserDetails, newUserDetails,
+            ['name', 'status', 'imageUrl', 'friends'], fieldsToBePopulated, function(err, updatedUserDetails) {
+                if(err) {
+                    throw new Error("Update Failed");
+                }
+                console.log("User details updated", updatedUserDetails);
+                res.send(updatedUserDetails);
         })
     };
     userService.fetchUserDetailsByFbId(newUserDetails['fbId'], false, fetchUserCallback);
