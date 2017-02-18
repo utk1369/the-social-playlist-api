@@ -8,7 +8,7 @@ var userService = require('../../../services/UserService');
 router.use('/login',  function(req, res, next) {
     var compressFlag = req.param('compress');
     if(compressFlag != null && compressFlag === 'true') {
-        var userInfo = req.body;
+        var userInfo = req.body['user'];
         var friendsList = userInfo['friends'];
         if(friendsList != null && friendsList.length > 0) {
             var fbIds = [];
@@ -25,7 +25,7 @@ router.use('/login',  function(req, res, next) {
                     friendsList[i]['friend'] = fbIdToUserIdMap[i]['_id'];
                 }
                 userInfo['friends'] = friendsList;
-                req.body = userInfo;
+                req.body['user'] = userInfo;
                 return next();
             })
         } else {

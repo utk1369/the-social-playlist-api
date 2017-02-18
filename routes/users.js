@@ -66,12 +66,9 @@ router.post('/updateAttributes', function(req, res, next) {
 });
 
 router.post('/login', function(req, res, next) {
-    var populate = req.param('populate');
-    var fieldsToBePopulated = null;
-    if(populate)
-        fieldsToBePopulated = populate.split(',');
     var payload = req.body;
-    var newUserDetails = new User(payload);
+    var newUserDetails = new User(payload['user']);
+    var populateObjList = payload['populate'];
 
     var fetchUserCallback =  function(err, existingUserDetails) {
         if(err) {
@@ -79,7 +76,7 @@ router.post('/login', function(req, res, next) {
             throw new Error("Failed to find User");
         }
         userService.updateUserDetails(existingUserDetails, newUserDetails,
-            ['name', 'imageUrl', 'friends'], fieldsToBePopulated, function(err, updatedUserDetails) {
+            ['name', 'imageUrl', 'friends'], populateObjList, function(err, updatedUserDetails) {
                 if(err) {
                     throw new Error("Update Failed");
                 }

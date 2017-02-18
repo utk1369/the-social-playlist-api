@@ -90,10 +90,14 @@ var saveUser =
     * options: {new: true} ensures that always the modified object is returned
  */
 var updateUserAttributesById =
-    function(userId, fieldsToBeUpdated, fieldsToBePopulated, callback) {
+    function(userId, fieldsToBeUpdated, populateObjList, callback) {
         var query = User.findByIdAndUpdate(userId, { $set: fieldsToBeUpdated}, { new: true });
-        if(fieldsToBePopulated != null && fieldsToBePopulated.length > 0)
-            query = query.populate(fieldsToBePopulated);
+        if(populateObjList != null && populateObjList.length > 0) {
+            for(var i in populateObjList) {
+                var populateObj = populateObjList[i];
+                query = query.populate(populateObj.path, populateObj.select);
+            }
+        }
         query.exec(callback);
     };
 
@@ -102,7 +106,7 @@ var updateUserAttributesById =
  * newUserDetails: New User Details against which the comparison of the existingUserDetails is to be made
  */
 var updateUserDetails =
-    function(existingUserDetails, newUserDetails, attributesToUpdate, fieldsToBePopulated, callback) {
+    function(existingUserDetails, newUserDetails, attributesToUpdate, populateObjList, callback) {
         if(existingUserDetails == null) {
             saveUser(newUserDetails, callback);
         } else if(newUserDetails == null) {
@@ -118,7 +122,7 @@ var updateUserDetails =
             }
             if(attributesToUpdate.indexOf('friends') != -1)
                 fieldsToBeUpdated['friends'] = newUserDetails['friends'];
-            updateUserAttributesById(existingUserDetails['_id'], fieldsToBeUpdated, fieldsToBePopulated, callback);
+            updateUserAttributesById(existingUserDetails['_id'], fieldsToBeUpdated, populateObjList, callback);
         }
     };
 
