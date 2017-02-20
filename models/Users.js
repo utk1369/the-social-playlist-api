@@ -28,7 +28,7 @@ var userSchema = new Schema({
             lastListenedAt: Date,
             likes: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
             rating: Number,
-            socialActivities: [{type: mongoose.Schema.Types.ObjectId, ref: 'SocialActivity'}] //to be added to android
+            socialActivities: [{type: mongoose.Schema.Types.ObjectId, ref: 'SocialActivity'}]
             //socialActivities are associated with every song so that we can query for only relevant activities song wise. also there is no link back from social activity to song
         }],
         createdAt: Date,

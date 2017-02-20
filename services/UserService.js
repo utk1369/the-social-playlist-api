@@ -130,27 +130,15 @@ var saveSongsForUser =
     function(userId, songsListToBeSaved, callback) {
 
         var compareAndSave = function(songsListOfUser, songsToBeSaved) {
-            var mergedList = [];
-
-            var findAndRemoveFromList = function(searchElement, listOfSongs) {
-                for(var i in listOfSongs) {
-                    if(searchElement['id'] === listOfSongs[i]['id']) {
-                        var updatedDetails = listOfSongs[i];
-                        listOfSongs.splice(i, 1);
-                        return updatedDetails;
-                    }
-                }
-                return null;
+            var mergedMap = {}; var mergedList = [];
+            var aggregatedList = songsListOfUser.concat(songsToBeSaved);
+            for(var i in aggregatedList) {
+               mergedMap[aggregatedList[i]['id']] = aggregatedList[i];
             }
 
-            for(var i in songsListOfUser) {
-                var newSongDetails = findAndRemoveFromList(songsListOfUser[i], songsToBeSaved);
-                if(newSongDetails)
-                    mergedList.push(newSongDetails);
-                else
-                    mergedList.push(songsListOfUser[i]);
+            for(var id in mergedMap) {
+                mergedList.push(mergedMap[id]);
             }
-            mergedList = mergedList.concat(songsToBeSaved);
 
             updateUserAttributesById(userId, {'songs': mergedList}, null, function(err, result) {
                 if(err)
