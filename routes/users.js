@@ -85,6 +85,21 @@ router.post('/login', function(req, res, next) {
         })
     };
     userService.fetchUserDetailsByFbId(newUserDetails['fbId'], false, fetchUserCallback);
+});
+
+router.post('/profile/:id', function(req, res, next) {
+    var payload = req.body;
+    var userId = req.params.id;
+    var projectionsArr = payload['projections'];
+    var populateObjList = payload['populate'];
+
+    userService.fetchById(userId, projectionsArr, populateObjList, function(err, profile) {
+        if(err) {
+            throw new Error("Error in obtaining user details");
+        }
+        console.log("Fetched User Profile for id: ", profile._id);
+        res.send(profile);
+    })
 })
 
 router.post('/:id/songs/save', function(req, res, next) {

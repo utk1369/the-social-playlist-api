@@ -3,9 +3,19 @@ var User = require('../models/Users');
 var songService = require('./SongService')
 
 var fetchUserDetailsById =
-    function(userId) {
-        //this method returns the user details based on the id provided.
-        //the result will also populate the friends list along with few basic details like name, status, imageUrl etc
+    function(userId, projectionsArr, populateObjList, callback) {
+        var projections = null;
+        if(projectionsArr != null)
+            projections = projectionsArr.join(' ');
+
+        var query = User.findById(userId, projections);
+        if(populateObjList != null && populateObjList.length > 0) {
+            for(var i in populateObjList) {
+                var populateObj = populateObjList[i];
+                query = query.populate(populateObj.path, populateObj.select);
+            }
+        }
+        query.exec(callback);
     }
 
 /*
@@ -165,7 +175,8 @@ var userService = {
     fetchUserDetailsByFbId: fetchUserDetailsByFbId,
     updateFriendsListForUser: updateFriendsListForUser,
     fbIdToUserIdMap: getFbIdToUserIdMap,
-    saveSongs: saveSongsForUser
+    saveSongs: saveSongsForUser,
+    fetchById: fetchUserDetailsById
 }
 
 module.exports = userService;
