@@ -2,6 +2,8 @@ var usersFilters = require('../middlewares/filters/request/users');
 var router = usersFilters.router;
 var userService = usersFilters.userService;
 var User = require('../models/Users');
+var activityService = require('../services/SocialActivitiesService')
+var Activity = require('../models/SocialActivities');
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
@@ -115,6 +117,26 @@ router.post('/:id/songs/save', function(req, res, next) {
 
 router.post('/:id/songs/remove', function(req, res, next) {
 
+});
+
+router.post('/:id/songs/activity/link', function(req, res, next) {
+    var userId = req.params.id;
+    var payload = req.body;
+    var activityToBeSaved = new Activity(payload);
+
+    activityService.save(activityToBeSaved, function(err, savedActivity) {
+        if(err) {
+            throw new Error('Save failed for this activity');
+        } else {
+            userService.linkSongToActivity(userId, savedActivity['songMetadata'], savedActivity._id, function(err, result) {
+                if(err){
+                    throw new Error('Linking failed for this song and activity');
+                } else {
+                    res.send(result);
+                }
+            })
+        }
+    })
 });
 
 module.exports = {

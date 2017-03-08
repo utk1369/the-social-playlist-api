@@ -10,8 +10,9 @@ var db = require('./models/db');
 var user = require('./models/Users');
 
 //Configure Component Routes
-var routes = require('./routes/index');
+var index = require('./routes/index');
 var users = require('./routes/users');
+var activities = require('./routes/activities')
 
 var app = express();
 
@@ -27,8 +28,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', routes);
+app.use('/', index);
 app.use('/users', users.router);
+app.use('/activities', activities);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -1,7 +1,5 @@
 var User = require('../models/Users');
 
-var songService = require('./SongService')
-
 var fetchUserDetailsById =
     function(userId, projectionsArr, populateObjList, callback) {
         var projections = null;
@@ -159,10 +157,43 @@ var saveSongsForUser =
         }
 
         User.findById(userId, 'songs', function(err, songsListOfUser) {
-            if(err) {
-                throw new Error("Unable to fetch Songs");
+            if (err) {
+                callback(err, null);
+            } else {
+                compareAndSave(songsListOfUser['songs'], songsListToBeSaved);
             }
-            compareAndSave(songsListOfUser['songs'], songsListToBeSaved);
+        })
+    }
+
+var linkSongToActivity =
+    function(userId, songToBeLinked, activityId, callback) {
+        User.findById(userId, 'songs', function(err, songsListOfUser) {
+            if(err) {
+                callback(err, null);
+            } else {    
+                for(var i in songsListOfUser['songs']) {
+                    var song = songsListOfUser['songs'][i];
+                    if(songToBeLinked['id'] === song['id']) {
+                        if(song['socialActivities'] == null)
+                            song['socialActivities'] = [];
+                        song['socialActivities'].push(activityId);
+                        songsListOfUser['songs'][i] = song;
+                        break;
+                    }
+                }
+                updateUserAttributesById(userId, {'songs': songsListOfUser['songs']}, null, function(err, result) {
+                    if(err)
+                        callback(err, null);
+                    else {
+                        for(var i in result['songs']) {
+                            if(result['songs'][i]['id'] === songToBeLinked['id']) {
+                                callback(null, result['songs'][i]);
+                                break;
+                            }
+                        }
+                    }
+                });
+            }
         })
     }
 
@@ -176,7 +207,8 @@ var userService = {
     updateFriendsListForUser: updateFriendsListForUser,
     fbIdToUserIdMap: getFbIdToUserIdMap,
     saveSongs: saveSongsForUser,
-    fetchById: fetchUserDetailsById
+    fetchById: fetchUserDetailsById,
+    linkSongToActivity: linkSongToActivity
 }
 
 module.exports = userService;
