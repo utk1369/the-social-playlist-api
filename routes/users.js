@@ -119,10 +119,10 @@ router.post('/:id/songs/remove', function(req, res, next) {
 
 });
 
-router.post('/:id/songs/activity/link', function(req, res, next) {
-    var userId = req.params.id;
+router.post('/activity/save', function(req, res, next) {
     var payload = req.body;
     var activityToBeSaved = new Activity(payload);
+    var userId = activityToBeSaved['postedBy'];
 
     activityService.save(activityToBeSaved, function(err, savedActivity) {
         if(err) {
