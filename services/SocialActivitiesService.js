@@ -12,8 +12,8 @@ var getActivityForGivenId = function(activityId, populateObjList, callback) {
     query.exec(callback);
 }
 
-var getActivityForGivenCriteria = function(criteria, populateObjects, callback) {
-
+var getActivityForGivenCriteria = function(criteria, callback) {
+    SocialActivity.find(criteria, callback);
 }
 
 var saveActivity = function(activity, callback) {

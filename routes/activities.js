@@ -29,5 +29,16 @@ router.post('/fetch/:id', function(req, res, next) {
     })
 })
 
+router.post('/search', function(req, res, next) {
+    var searchPayload = req.body;
+    activityService.getActivityByCriteria(searchPayload, function(err, searchResults) {
+        if(err) {
+            throw new Error('Error occurred while searching activities for the given criteria');
+        } else {
+            res.send(searchResults);
+        }
+    })
+})
+
 
 module.exports = router;
