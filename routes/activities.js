@@ -40,5 +40,16 @@ router.post('/search', function(req, res, next) {
     })
 })
 
+router.get('/feed/:userId', function(req, res, next) {
+    var userId = req.params.userId;
+    activityService.getFeed(userId, function(err, feeds) {
+        if(err) {
+            throw new Error('Error occurred while fetching feeds for the user.');
+        } else {
+            res.send(feeds);
+        }
+    })
+})
+
 
 module.exports = router;
