@@ -20,6 +20,7 @@ var songSchema = new Schema({
     metadata: songMetadataSchema,
     externalLinks: [externalLinksSchema],
     hits: {type: Number, default: 0},
+    views: {type: Number, default: 0},
     lastListenedAt: Date,
     likes: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
     rating: Number,
