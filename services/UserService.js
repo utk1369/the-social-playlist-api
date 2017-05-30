@@ -88,8 +88,15 @@ var searchUsers =
  * callback: a results handler after the results are retrieved
  */
 var saveUser =
-    function(user, callback) {
-        user.save(callback);
+    function(user, populateObjList, callback) {
+        console.log("User to be created", user);
+        user.save(function(err, user) {
+            if(err)
+                callback(err, null);
+            else {
+                updateUserAttributesById(user['_id'], {}, populateObjList, callback);
+            }
+        });
     };
 
 /*
@@ -116,7 +123,7 @@ var updateUserAttributesById =
 var updateUserDetails =
     function(existingUserDetails, newUserDetails, attributesToUpdate, populateObjList, callback) {
         if(existingUserDetails == null) {
-            saveUser(newUserDetails, callback);
+            saveUser(newUserDetails, populateObjList, callback);
         } else if(newUserDetails == null) {
             callback(null, existingUserDetails);
         } else {

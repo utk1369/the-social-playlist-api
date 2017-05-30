@@ -80,7 +80,7 @@ router.post('/login', function(req, res, next) {
         userService.updateUserDetails(existingUserDetails, newUserDetails,
             ['name', 'imageUrl', 'friends'], populateObjList, function(err, updatedUserDetails) {
                 if(err) {
-                    throw new Error("Update Failed");
+                    throw new Error("Update Failed", err);
                 }
                 console.log("User details updated", updatedUserDetails);
                 res.send(updatedUserDetails);

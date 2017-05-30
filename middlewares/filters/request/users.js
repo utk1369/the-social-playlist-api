@@ -20,11 +20,13 @@ router.use('/login',  function(req, res, next) {
                     console.log("Failed to fetch userids for given fbids");
                     throw new Error("Failed to fetch userids for given fbids");
                 }
+                var existingUsers = [];
                 for(var i in fbIdToUserIdMap) {
-                    friendsList[i]['fbId'] = fbIdToUserIdMap[i]['fbId'];
-                    friendsList[i]['friend'] = fbIdToUserIdMap[i]['_id'];
+                    existingUsers[i] = {};
+                    existingUsers[i]['fbId'] = fbIdToUserIdMap[i]['fbId'];
+                    existingUsers[i]['friend'] = fbIdToUserIdMap[i]['_id'];
                 }
-                userInfo['friends'] = friendsList;
+                userInfo['friends'] = existingUsers;
                 req.body['user'] = userInfo;
                 return next();
             })
