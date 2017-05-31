@@ -2,6 +2,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var songMetadataSchema = new Schema({
+    metadataHash: {type: String, required: true},
     id: {type: Number, required: true},
     title: {type: String, required: true},
     artist: String,

@@ -148,11 +148,11 @@ var saveSongsForUser =
             var mergedMap = {}; var mergedList = [];
             var aggregatedList = songsListOfUser.concat(songsToBeSaved);
             for(var i in aggregatedList) {
-               mergedMap[aggregatedList[i]['id']] = aggregatedList[i];
+               mergedMap[aggregatedList[i]['metadata']['metadataHash']] = aggregatedList[i];
             }
 
-            for(var id in mergedMap) {
-                mergedList.push(mergedMap[id]);
+            for(var hash in mergedMap) {
+                mergedList.push(mergedMap[hash]);
             }
 
             updateUserAttributesById(userId, {'songs': mergedList}, null, function(err, result) {
@@ -180,7 +180,7 @@ var linkSongToActivity =
             } else {    
                 for(var i in songsListOfUser['songs']) {
                     var song = songsListOfUser['songs'][i];
-                    if(songToBeLinked['id'] === song['id']) {
+                    if(songToBeLinked['metadata']['metadataHash'] === song['metadata']['metadataHash']) {
                         if(song['socialActivities'] == null)
                             song['socialActivities'] = [];
                         song['socialActivities'].push(activityId);
@@ -193,7 +193,7 @@ var linkSongToActivity =
                         callback(err, null);
                     else {
                         for(var i in result['songs']) {
-                            if(result['songs'][i]['id'] === songToBeLinked['id']) {
+                            if(result['songs'][i]['metadata']['metadataHash'] === songToBeLinked['metadata']['metadataHash']) {
                                 callback(null, result['songs'][i]);
                                 break;
                             }
