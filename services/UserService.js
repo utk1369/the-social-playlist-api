@@ -180,7 +180,7 @@ var linkSongToActivity =
             } else {    
                 for(var i in songsListOfUser['songs']) {
                     var song = songsListOfUser['songs'][i];
-                    if(songToBeLinked['metadata']['metadataHash'] === song['metadata']['metadataHash']) {
+                    if(songToBeLinked['metadataHash'] === song['metadata']['metadataHash']) {
                         if(song['socialActivities'] == null)
                             song['socialActivities'] = [];
                         song['socialActivities'].push(activityId);
@@ -193,7 +193,7 @@ var linkSongToActivity =
                         callback(err, null);
                     else {
                         for(var i in result['songs']) {
-                            if(result['songs'][i]['metadata']['metadataHash'] === songToBeLinked['metadata']['metadataHash']) {
+                            if(result['songs'][i]['metadata']['metadataHash'] === songToBeLinked['metadataHash']) {
                                 callback(null, result['songs'][i]);
                                 break;
                             }
