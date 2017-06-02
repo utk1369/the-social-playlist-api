@@ -4,11 +4,11 @@ var SongSchema = require('./Songs');
 var socialActivitySchema = new mongoose.Schema({
         postedBy: {type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true},
         caption: {type: String},
-        parentActivity: {type: mongoose.Schema.Types.ObjectId, ref: 'SocialActivity'},
         activityType: {type: String, enum: ["DEDICATE", "RECOMMEND", "SHARE"], required: true},
         domain: {type: String, enum: ["PUBLIC", "PRIVATE"], default: "PUBLIC"},
         recipientUserIds: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
         songMetadata: SongSchema.metadata,
+        link: {type: String},
         likes: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
         createdAt: Date,
         updatedAt: Date
