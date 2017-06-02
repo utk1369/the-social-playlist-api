@@ -128,13 +128,17 @@ router.post('/activity/save', function(req, res, next) {
         if(err) {
             throw new Error('Save failed for this activity');
         } else {
-            userService.linkSongToActivity(userId, savedActivity['songMetadata'], savedActivity._id, function(err, result) {
-                if(err){
-                    throw new Error('Linking failed for this song and activity');
-                } else {
-                    res.send(result);
-                }
-            })
+            if(savedActivity['songMetadata'] == null) {
+                res.send(savedActivity);
+            } else {
+                userService.linkSongToActivity(userId, savedActivity['songMetadata'], savedActivity._id, function(err, result) {
+                    if(err){
+                        throw new Error('Linking failed for this song and activity');
+                    } else {
+                        res.send(savedActivity);
+                    }
+                })
+            }
         }
     })
 });
