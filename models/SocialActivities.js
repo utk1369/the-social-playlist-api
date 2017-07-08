@@ -8,7 +8,13 @@ var socialActivitySchema = new mongoose.Schema({
         domain: {type: String, enum: ["PUBLIC", "PRIVATE"], default: "PUBLIC"},
         recipientUserIds: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
         songMetadata: SongSchema.metadata,
-        link: {type: String},
+        source: {type: String, enum: ["LOCAL", "EXTERNAL"]},
+        link: {
+            previewTitle: {type: String},
+            previewDesc: {type: String},
+            previewImage: {type: String},
+            url: {type: String}
+        },
         likes: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
         createdAt: Date,
         updatedAt: Date
@@ -19,3 +25,5 @@ var socialActivitySchema = new mongoose.Schema({
 
 var SocialActivity = mongoose.model('SocialActivity', socialActivitySchema);
 module.exports = SocialActivity;
+
+
