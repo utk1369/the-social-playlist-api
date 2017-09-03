@@ -1,0 +1,50 @@
+
+
+
+1. Register User Api
+    - take fbId, name, image, listOfFriendsFbIds
+    - create a new user and update friendlist of every friend of this user with this user's id
+    - less frequent
+
+2. Login Api
+    - take fbAccessToken and validate it with passport
+    - return back jwt with basic userInfo or return 401 Unauthorized
+    - less frequent
+
+3. Authentication Middleware
+    - takes jwt from header or get parameter
+    - if valid, passes on the decoded info from jwt to Apis or else returns 401 Unauthorized
+    - very frequent
+
+4. Get User Profile
+    - takes User Id
+    - returns User Document or 404 user not found (without populating any Ids)
+    - frequent
+
+5. Get Activities based on criteria specified in UrlParams
+    - takes criteria
+    - returns a list of activities matching the criteria
+    - very frequent(esp during feed generation)
+
+6. Patch Update User Details
+    - query params -> userId
+    - payload -> json object with the user document payload format
+    - for array updates refer: https://stackoverflow.com/questions/15691224/mongoose-update-values-in-array-of-objects
+    - examples: status/profile info change, update song details
+    - less frequent and non concurrent
+    - permit check reqd
+
+7. Create Activity
+    - take payload as per the model
+    - create the activity
+    - frequent
+    - permit check reqd. the token shd match with that of poster's.
+
+8. Patch Update Activity
+    - query param -> activityId
+    - take attributes to update as payload
+    - permit check required
+    - example: like activity, share activity, update views
+    - very frequent and concurrent
+
+
