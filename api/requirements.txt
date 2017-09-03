@@ -2,6 +2,7 @@
 
 
 1. Register User Api
+    - Authenticate fbAccessToken using passport
     - take fbId, name, image, listOfFriendsFbIds
     - create a new user and update friendlist of every friend of this user with this user's id
     - less frequent
@@ -30,7 +31,7 @@
     - query params -> userId
     - payload -> json object with the user document payload format
     - for array updates refer: https://stackoverflow.com/questions/15691224/mongoose-update-values-in-array-of-objects
-    - examples: status/profile info change, update song details
+    - examples: status/profile info change, update song details, friendslist change
     - less frequent and non concurrent
     - permit check reqd
 
